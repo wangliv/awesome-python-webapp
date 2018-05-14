@@ -237,7 +237,7 @@ if __name__ == '__main__':
     # 测试查询
     create_engine('root', 'root', 'dbwl')
     values = select('select *from sys_user')
-    print values
+    #print values
     # 测试更新
     # create_engine('root', 'root', 'dbwl')
     # r = update("update sys_user set name=? where id=?", 'wangli6', 1)
