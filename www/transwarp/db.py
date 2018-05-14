@@ -101,8 +101,7 @@ class _TransactionCtx(object):
             if self.should_close_conn:
                 _db_ctx.cleanup()
 
-    @staticmethod
-    def commit():
+    def commit(self):
         global _db_ctx
         try:
             _db_ctx.connection.commit()
@@ -110,8 +109,7 @@ class _TransactionCtx(object):
             _db_ctx.connection.rollback()
             raise
 
-    @staticmethod
-    def rollback():
+    def rollback(self):
         global _db_ctx
         _db_ctx.connection.rollback()
 
