@@ -17,6 +17,10 @@ class _Engine(object):
     def connect(self):
         return self._connect
 
+    def disconnect(self):
+        self._connect.close()
+        self._connect = None
+
 # 实现懒连接数据库
 
 
@@ -39,6 +43,7 @@ class _LazyConnection(object):
         if self.connection:
             self.connection.close()
             self.connection = None
+            engine.disconnect()
 
 # 持有数据库连接上下文对象
 
@@ -159,7 +164,7 @@ class DBError(StandardError):
 def create_engine(user, password, database):
     import mysql.connector
     global engine
-    if engine is not None:
+    if engine is not None and engine.connect() is not None:
         raise DBError('连接已初始化...')
     conn = mysql.connector.connect(user=user, password=password, database=database, use_unicode=True)
     engine = _Engine(conn)
@@ -189,6 +194,28 @@ def select(sql, *args):
 
 
 """
+修改
+"""
+
+
+@with_transaction
+def update(sql, *args):
+    global _db_ctx
+    cursor = None
+    sql = sql.replace('?', '%s')
+    try:
+        cursor = _db_ctx.connection.cursor()
+        cursor.execute(sql, args)
+        r = cursor.rowcount
+        if _db_ctx.transactions == 0:
+            _db_ctx.connection.commit()
+        return r
+    finally:
+        if cursor:
+            cursor.close()
+
+
+"""
 实现一个字典字段转换
 """
 
@@ -208,7 +235,13 @@ class Dict(dict):
 
 if __name__ == '__main__':
 
+    # 测试查询
     create_engine('root', 'root', 'dbwl')
-    values = select('select *from sys_user where id=?', 5)
-    for x in values:
-        print x
+    values = select('select *from sys_user where id=?', 1)
+    print values
+    # 测试更新
+    create_engine('root', 'root', 'dbwl')
+    r = update("update sys_user set name=? where id=?", 'wangli6', 1)
+    print r
+
+
