@@ -236,12 +236,20 @@ class Dict(dict):
 if __name__ == '__main__':
 
     # 测试查询
-    create_engine('root', 'root', 'dbwl')
-    values = select('select *from sys_user where id=?', 1)
-    print values
+    # create_engine('root', 'root', 'dbwl')
+    # values = select('select *from sys_user where id=?', 1)
+    # print values
     # 测试更新
+    # create_engine('root', 'root', 'dbwl')
+    # r = update("update sys_user set name=? where id=?", 'wangli6', 1)
+    # print r
+    # 测试插入
+    # create_engine('root', 'root', 'dbwl')
+    # r = update("insert into sys_user(id,name) values(?,?)", 2, 'zhangsan')
+    # print r
+    # 测试删除
     create_engine('root', 'root', 'dbwl')
-    r = update("update sys_user set name=? where id=?", 'wangli6', 1)
+    r = update("delete from sys_user where id=?", 2)
     print r
 
 
