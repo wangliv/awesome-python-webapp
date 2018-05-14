@@ -21,9 +21,9 @@ class StringField(Field):
 
 
 class ModelMetaclass(type):
-    def __new__(cls, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs):
         if name == 'Model':
-            return type.__new__(cls, name, bases, attrs)
+            return type.__new__(mcs, name, bases, attrs)
         print('Found model: %s' % name)
         mappings = dict()
         for key, value in attrs.iteritems():
@@ -32,7 +32,7 @@ class ModelMetaclass(type):
         for k in mappings.iterkeys():
             attrs.pop(k)
         attrs['__mappings__'] = mappings
-        return type.__new__(cls, name, bases, attrs)
+        return type.__new__(mcs, name, bases, attrs)
 
 
 # 所有model的父类
@@ -67,6 +67,21 @@ class Model(dict):
         db.create_engine('root', 'root', 'dbwl')
         return db.update(sql, *args)
 
+    @classmethod
+    def findall(cls, conditions='where 1=1 ', *args):
+        db.create_engine('root', 'root', 'dbwl')
+        sql = 'select * from %s %s ' % (cls.__table__, conditions)
+        return db.select(sql, *args)
+
+    @classmethod
+    def findone(cls, conditions='where 1=1 ', *args):
+        db.create_engine('root', 'root', 'dbwl')
+        sql = 'select * from %s %s ' % (cls.__table__, conditions)
+        rs = db.select(sql, *args)
+        if rs.__len__() != 0:
+            rs = rs[0]
+        return rs
+
 
 class UserModel(Model):
     __table__ = 'sys_user'
@@ -75,6 +90,7 @@ class UserModel(Model):
 
 
 if __name__ == '__main__':
-    user = UserModel(id='5', name='wangli')
-    print user.save()
-
+    # user = UserModel(id='5', name='wangli')
+    # print user.save()
+    lst = UserModel.findone('where id=?', '1')
+    print lst
