@@ -185,8 +185,7 @@ def select(sql, *args):
     try:
         cursor = _db_ctx.connection.cursor()
         cursor.execute(sql, args)
-        if cursor.description:
-            names = [x[0] for x in cursor.description]
+        names = [x[0] for x in cursor.description]
         return [Dict(names, x) for x in cursor.fetchall()]
     finally:
         if cursor:
@@ -236,20 +235,20 @@ class Dict(dict):
 if __name__ == '__main__':
 
     # 测试查询
-    # create_engine('root', 'root', 'dbwl')
-    # values = select('select *from sys_user where id=?', 1)
-    # print values
+    create_engine('root', 'root', 'dbwl')
+    values = select('select *from sys_user')
+    print values
     # 测试更新
     # create_engine('root', 'root', 'dbwl')
     # r = update("update sys_user set name=? where id=?", 'wangli6', 1)
     # print r
     # 测试插入
     # create_engine('root', 'root', 'dbwl')
-    # r = update("insert into sys_user(id,name) values(?,?)", 2, 'zhangsan')
+    # r = update("insert into sys_user(id,name) values(?,?)", 4, 'wangwu')
     # print r
     # 测试删除
-    create_engine('root', 'root', 'dbwl')
-    r = update("delete from sys_user where id=?", 2)
-    print r
+    # create_engine('root', 'root', 'dbwl')
+    # r = update("delete from sys_user where id=?", 2)
+    # print r
 
 
