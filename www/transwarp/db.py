@@ -167,7 +167,7 @@ def create_engine(user, password, database):
     engine = _Engine(conn)
 
 
-_db_ctx = _DbCtx()
+_db_ctx = _DbCtx()  # 全局的threadLocal上下文
 
 """
 查询语句
@@ -182,15 +182,35 @@ def select(sql, *args):
     try:
         cursor = _db_ctx.connection.cursor()
         cursor.execute(sql, args)
-        return cursor.fetchall()
+        if cursor.description:
+            names = [x[0] for x in cursor.description]
+        return [Dict(names, x) for x in cursor.fetchall()]
     finally:
         if cursor:
             cursor.close()
 
 
+"""
+实现一个字典字段转换
+"""
+
+
+class Dict(dict):
+    def __init__(self, names, values, **kw):
+        super(Dict, self).__init__(**kw)
+        for k, v in zip(names, values):
+            self[k] = v
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError('Dict has no attribute %s' % key)
+
+
 if __name__ == '__main__':
 
     create_engine('root', 'root', 'dbwl')
-    values = select('select *from sys_user')
+    values = select('select *from sys_user where id=?', 5)
     for x in values:
         print x
